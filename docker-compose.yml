@@ -1,0 +1,33 @@
+# Local run of both services against YOUR Supabase project (Supabase stays in the cloud).
+#   1. cp .env.example .env     and fill SUPABASE_URL, SUPABASE_SECRET_KEY, RULELOCK_API_TOKEN
+#   2. docker compose up --build
+#   shop      http://localhost:8080      (admin / admin123)
+#   rulelock  http://localhost:5001/health
+# Optional: put c2/c3/c4 tuning values (see rulelock/.env.example) in rulelock/.env.
+services:
+  rulelock:
+    build: ./rulelock
+    ports:
+      - "5001:5001"
+    env_file:
+      - path: ./rulelock/.env
+        required: false
+    environment:
+      PORT: "5001"
+      SUPABASE_URL: ${SUPABASE_URL:?Set SUPABASE_URL in .env (see .env.example)}
+      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:?Set SUPABASE_SECRET_KEY in .env}
+      RULELOCK_API_TOKEN: ${RULELOCK_API_TOKEN:?Set RULELOCK_API_TOKEN in .env}
+
+  shop:
+    build: ./shop
+    ports:
+      - "8080:80"
+    depends_on:
+      - rulelock
+    environment:
+      APP_ENV: development            # the image default is production; development allows RULELOCK_MOCK for tests
+      SUPABASE_URL: ${SUPABASE_URL:?Set SUPABASE_URL in .env}
+      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:?Set SUPABASE_SECRET_KEY in .env}
+      RULELOCK_URL: http://rulelock:5001
+      RULELOCK_API_TOKEN: ${RULELOCK_API_TOKEN:?Set RULELOCK_API_TOKEN in .env}
+      RULELOCK_MOCK: ${RULELOCK_MOCK:-0}

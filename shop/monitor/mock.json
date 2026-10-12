@@ -1,0 +1,492 @@
+{
+ "_note": "Sample reviews for RULELOCK_MOCK=1 (generated with the real c2, c3, c4). created_at is filled in by api.php.",
+ "reviews": [
+  {
+   "order_id": 1001,
+   "order_reference": "CZ-20261011100001",
+   "created_at": null,
+   "customer_name": "kamal",
+   "account_username": "kamal",
+   "decision": "accept",
+   "reason": "passed all checks",
+   "customer_message": "Thank you! Your order is accepted.",
+   "payment_action": "capture_payment",
+   "account_action": null,
+   "payment_method": "CARD",
+   "total": 7000,
+   "coupons_applied": [],
+   "pipeline": {
+    "c1_data_collection": {
+     "status": "complete",
+     "events_in_session": 3,
+     "session_features": {
+      "coupon_attempts_per_session": 0,
+      "avg_seconds_between_requests": 42.0,
+      "distinct_accounts_same_device": 1,
+      "distinct_addresses_same_phone": 1
+     },
+     "account": {
+      "user_id": 7,
+      "username": "kamal",
+      "account_age_days": 30,
+      "completed_orders": 2,
+      "cod_orders": 0,
+      "cod_bad_orders": 0
+     }
+    },
+    "c2_rule_engine": {
+     "status": "pass",
+     "checks": [
+      {
+       "code": "coupon_usage",
+       "label": "Coupon usage",
+       "passed": true,
+       "detail": "0 coupon(s) applied (max 1)"
+      },
+      {
+       "code": "discount_range",
+       "label": "Discount range",
+       "passed": true,
+       "detail": "Discount 0 is within 60% of subtotal 7000"
+      },
+      {
+       "code": "quantity_ceiling",
+       "label": "Quantity limit",
+       "passed": true,
+       "detail": "Quantity 2 for sku-1 is within 1 to 20"
+      },
+      {
+       "code": "minimum_purchase",
+       "label": "Minimum purchase",
+       "passed": true,
+       "detail": "Not applicable: no coupon applied"
+      },
+      {
+       "code": "price_mismatch",
+       "label": "Prices match catalog",
+       "passed": true,
+       "detail": "sku-1: supplied 3500, catalog 3500"
+      },
+      {
+       "code": "total_mismatch",
+       "label": "Total matches catalog",
+       "passed": true,
+       "detail": "Submitted total 7000 matches the recomputed total 7000"
+      },
+      {
+       "code": "coupon_velocity",
+       "label": "Coupon velocity",
+       "passed": true,
+       "detail": "Not applicable: no review history supplied"
+      },
+      {
+       "code": "cod_order_value",
+       "label": "COD order value",
+       "passed": true,
+       "detail": "Not applicable: payment method is CARD, not COD"
+      },
+      {
+       "code": "cod_abuse",
+       "label": "COD abuse history",
+       "passed": true,
+       "detail": "Not applicable: payment method is CARD, not COD"
+      }
+     ],
+     "violations": []
+    },
+    "c3_anomaly": {
+     "status": "normal",
+     "score": 0.1703,
+     "hold_threshold": -0.06,
+     "reject_threshold": -0.1
+    },
+    "c4_enforcement": {
+     "decision": "accept",
+     "action": "none",
+     "reason": "passed all checks",
+     "account_action": null
+    }
+   },
+   "account": {
+    "user_id": 7,
+    "username": "kamal",
+    "account_age_days": 30,
+    "completed_orders": 2,
+    "cod_orders": 0,
+    "cod_bad_orders": 0
+   }
+  },
+  {
+   "order_id": 1002,
+   "order_reference": "CZ-20261011100002",
+   "created_at": null,
+   "customer_name": "nimali",
+   "account_username": "nimali",
+   "decision": "void_discount",
+   "reason": "Coupons CAKE50 + CAKE20 + CAKE10 stacked (3 applied, max 1); Discount 5600 is not within 60% of subtotal 7000",
+   "customer_message": "Your order continues at the full price",
+   "payment_action": "void_discount",
+   "account_action": null,
+   "payment_method": "CARD",
+   "total": 1400,
+   "coupons_applied": [
+    "CAKE50",
+    "CAKE20",
+    "CAKE10"
+   ],
+   "pipeline": {
+    "c1_data_collection": {
+     "status": "complete",
+     "events_in_session": 5,
+     "session_features": {
+      "coupon_attempts_per_session": 3,
+      "avg_seconds_between_requests": 38.0,
+      "distinct_accounts_same_device": 1,
+      "distinct_addresses_same_phone": 1
+     },
+     "account": {
+      "user_id": 7,
+      "username": "nimali",
+      "account_age_days": 30,
+      "completed_orders": 2,
+      "cod_orders": 0,
+      "cod_bad_orders": 0
+     }
+    },
+    "c2_rule_engine": {
+     "status": "fail",
+     "checks": [
+      {
+       "code": "coupon_usage",
+       "label": "Coupon usage",
+       "passed": false,
+       "detail": "Coupons CAKE50 + CAKE20 + CAKE10 stacked (3 applied, max 1)"
+      },
+      {
+       "code": "discount_range",
+       "label": "Discount range",
+       "passed": false,
+       "detail": "Discount 5600 is not within 60% of subtotal 7000"
+      },
+      {
+       "code": "quantity_ceiling",
+       "label": "Quantity limit",
+       "passed": true,
+       "detail": "Quantity 2 for sku-1 is within 1 to 20"
+      },
+      {
+       "code": "minimum_purchase",
+       "label": "Minimum purchase",
+       "passed": true,
+       "detail": "Subtotal 7000 meets the minimum purchase of 500"
+      },
+      {
+       "code": "price_mismatch",
+       "label": "Prices match catalog",
+       "passed": true,
+       "detail": "sku-1: supplied 3500, catalog 3500"
+      },
+      {
+       "code": "total_mismatch",
+       "label": "Total matches catalog",
+       "passed": true,
+       "detail": "Submitted total 1400 matches the recomputed total 1400"
+      },
+      {
+       "code": "coupon_velocity",
+       "label": "Coupon velocity",
+       "passed": true,
+       "detail": "Coupon velocity 0 reviews in 24 h (max 5)"
+      },
+      {
+       "code": "cod_order_value",
+       "label": "COD order value",
+       "passed": true,
+       "detail": "Not applicable: payment method is CARD, not COD"
+      },
+      {
+       "code": "cod_abuse",
+       "label": "COD abuse history",
+       "passed": true,
+       "detail": "Not applicable: payment method is CARD, not COD"
+      }
+     ],
+     "violations": [
+      {
+       "code": "coupon_usage",
+       "reason": "Coupons CAKE50 + CAKE20 + CAKE10 stacked (3 applied, max 1)"
+      },
+      {
+       "code": "discount_range",
+       "reason": "Discount 5600 is not within 60% of subtotal 7000"
+      }
+     ]
+    },
+    "c3_anomaly": {
+     "status": "normal",
+     "score": 0.0287,
+     "hold_threshold": -0.06,
+     "reject_threshold": -0.1
+    },
+    "c4_enforcement": {
+     "decision": "void_discount",
+     "action": "void_discount",
+     "reason": "Coupons CAKE50 + CAKE20 + CAKE10 stacked (3 applied, max 1); Discount 5600 is not within 60% of subtotal 7000",
+     "account_action": null
+    }
+   },
+   "account": {
+    "user_id": 7,
+    "username": "nimali",
+    "account_age_days": 30,
+    "completed_orders": 2,
+    "cod_orders": 0,
+    "cod_bad_orders": 0
+   }
+  },
+  {
+   "order_id": 1003,
+   "order_reference": "CZ-20261011100003",
+   "created_at": null,
+   "customer_name": "ruwan",
+   "account_username": "ruwan",
+   "decision": "hold",
+   "reason": "Unverified COD total 17500 exceeds the cap of 15000",
+   "customer_message": "Your order is being reviewed. We will contact you soon.",
+   "payment_action": "hold_payment",
+   "account_action": null,
+   "payment_method": "COD",
+   "total": 17500,
+   "coupons_applied": [],
+   "pipeline": {
+    "c1_data_collection": {
+     "status": "complete",
+     "events_in_session": 3,
+     "session_features": {
+      "coupon_attempts_per_session": 0,
+      "avg_seconds_between_requests": 42.0,
+      "distinct_accounts_same_device": 1,
+      "distinct_addresses_same_phone": 1
+     },
+     "account": {
+      "user_id": 7,
+      "username": "ruwan",
+      "account_age_days": 2,
+      "completed_orders": 0,
+      "cod_orders": 1,
+      "cod_bad_orders": 0
+     }
+    },
+    "c2_rule_engine": {
+     "status": "fail",
+     "checks": [
+      {
+       "code": "coupon_usage",
+       "label": "Coupon usage",
+       "passed": true,
+       "detail": "0 coupon(s) applied (max 1)"
+      },
+      {
+       "code": "discount_range",
+       "label": "Discount range",
+       "passed": true,
+       "detail": "Discount 0 is within 60% of subtotal 17500"
+      },
+      {
+       "code": "quantity_ceiling",
+       "label": "Quantity limit",
+       "passed": true,
+       "detail": "Quantity 5 for sku-1 is within 1 to 20"
+      },
+      {
+       "code": "minimum_purchase",
+       "label": "Minimum purchase",
+       "passed": true,
+       "detail": "Not applicable: no coupon applied"
+      },
+      {
+       "code": "price_mismatch",
+       "label": "Prices match catalog",
+       "passed": true,
+       "detail": "sku-1: supplied 3500, catalog 3500"
+      },
+      {
+       "code": "total_mismatch",
+       "label": "Total matches catalog",
+       "passed": true,
+       "detail": "Submitted total 17500 matches the recomputed total 17500"
+      },
+      {
+       "code": "coupon_velocity",
+       "label": "Coupon velocity",
+       "passed": true,
+       "detail": "Not applicable: no review history supplied"
+      },
+      {
+       "code": "cod_order_value",
+       "label": "COD order value",
+       "passed": false,
+       "detail": "Unverified COD total 17500 exceeds the cap of 15000"
+      },
+      {
+       "code": "cod_abuse",
+       "label": "COD abuse history",
+       "passed": true,
+       "detail": "COD abuse: 0 of 1 previous COD orders were cancelled by the customer or refused"
+      }
+     ],
+     "violations": [
+      {
+       "code": "cod_order_value",
+       "reason": "Unverified COD total 17500 exceeds the cap of 15000"
+      }
+     ]
+    },
+    "c3_anomaly": {
+     "status": "normal",
+     "score": 0.1703,
+     "hold_threshold": -0.06,
+     "reject_threshold": -0.1
+    },
+    "c4_enforcement": {
+     "decision": "hold",
+     "action": "hold_cod_order",
+     "reason": "Unverified COD total 17500 exceeds the cap of 15000",
+     "account_action": null
+    }
+   },
+   "account": {
+    "user_id": 7,
+    "username": "ruwan",
+    "account_age_days": 2,
+    "completed_orders": 0,
+    "cod_orders": 1,
+    "cod_bad_orders": 0
+   }
+  },
+  {
+   "order_id": 1004,
+   "order_reference": "CZ-20261011100004",
+   "created_at": null,
+   "customer_name": "sahan",
+   "account_username": "sahan",
+   "decision": "reject",
+   "reason": "Price mismatch: sku-1: supplied 100, catalog 3500; Submitted total 200 does not match the total 7000 recomputed from catalog prices, quantities and coupons (difference 6800)",
+   "customer_message": "Sorry, we could not process this order.",
+   "payment_action": "block_payment",
+   "account_action": null,
+   "payment_method": "CARD",
+   "total": 200,
+   "coupons_applied": [],
+   "pipeline": {
+    "c1_data_collection": {
+     "status": "complete",
+     "events_in_session": 3,
+     "session_features": {
+      "coupon_attempts_per_session": 0,
+      "avg_seconds_between_requests": 42.0,
+      "distinct_accounts_same_device": 1,
+      "distinct_addresses_same_phone": 1
+     },
+     "account": {
+      "user_id": 7,
+      "username": "sahan",
+      "account_age_days": 30,
+      "completed_orders": 2,
+      "cod_orders": 0,
+      "cod_bad_orders": 0
+     }
+    },
+    "c2_rule_engine": {
+     "status": "fail",
+     "checks": [
+      {
+       "code": "coupon_usage",
+       "label": "Coupon usage",
+       "passed": true,
+       "detail": "0 coupon(s) applied (max 1)"
+      },
+      {
+       "code": "discount_range",
+       "label": "Discount range",
+       "passed": true,
+       "detail": "Discount 0 is within 60% of subtotal 200"
+      },
+      {
+       "code": "quantity_ceiling",
+       "label": "Quantity limit",
+       "passed": true,
+       "detail": "Quantity 2 for sku-1 is within 1 to 20"
+      },
+      {
+       "code": "minimum_purchase",
+       "label": "Minimum purchase",
+       "passed": true,
+       "detail": "Not applicable: no coupon applied"
+      },
+      {
+       "code": "price_mismatch",
+       "label": "Prices match catalog",
+       "passed": false,
+       "detail": "Price mismatch: sku-1: supplied 100, catalog 3500"
+      },
+      {
+       "code": "total_mismatch",
+       "label": "Total matches catalog",
+       "passed": false,
+       "detail": "Submitted total 200 does not match the total 7000 recomputed from catalog prices, quantities and coupons (difference 6800)"
+      },
+      {
+       "code": "coupon_velocity",
+       "label": "Coupon velocity",
+       "passed": true,
+       "detail": "Not applicable: no review history supplied"
+      },
+      {
+       "code": "cod_order_value",
+       "label": "COD order value",
+       "passed": true,
+       "detail": "Not applicable: payment method is CARD, not COD"
+      },
+      {
+       "code": "cod_abuse",
+       "label": "COD abuse history",
+       "passed": true,
+       "detail": "Not applicable: payment method is CARD, not COD"
+      }
+     ],
+     "violations": [
+      {
+       "code": "price_mismatch",
+       "reason": "Price mismatch: sku-1: supplied 100, catalog 3500"
+      },
+      {
+       "code": "total_mismatch",
+       "reason": "Submitted total 200 does not match the total 7000 recomputed from catalog prices, quantities and coupons (difference 6800)"
+      }
+     ]
+    },
+    "c3_anomaly": {
+     "status": "normal",
+     "score": 0.1703,
+     "hold_threshold": -0.06,
+     "reject_threshold": -0.1
+    },
+    "c4_enforcement": {
+     "decision": "reject",
+     "action": "reject_order",
+     "reason": "Price mismatch: sku-1: supplied 100, catalog 3500; Submitted total 200 does not match the total 7000 recomputed from catalog prices, quantities and coupons (difference 6800)",
+     "account_action": null
+    }
+   },
+   "account": {
+    "user_id": 7,
+    "username": "sahan",
+    "account_age_days": 30,
+    "completed_orders": 2,
+    "cod_orders": 0,
+    "cod_bad_orders": 0
+   }
+  }
+ ]
+}

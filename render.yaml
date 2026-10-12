@@ -1,0 +1,45 @@
+# Render Blueprint: two FREE Docker web services. New > Blueprint > pick this repo.
+# Secrets are asked for in the dashboard (sync: false) because they must never live in the repo.
+# After the first deploy: copy the public URL of "rulelock" into RULELOCK_URL of "cakezz-shop".
+services:
+  - type: web
+    name: rulelock
+    runtime: docker
+    plan: free
+    dockerContext: ./rulelock
+    dockerfilePath: ./rulelock/Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: RULELOCK_API_TOKEN          # the same value as in cakezz-shop
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: WEB_CONCURRENCY             # free plan has about 512 MB RAM
+        value: "1"
+
+  - type: web
+    name: cakezz-shop
+    runtime: docker
+    plan: free
+    dockerContext: ./shop
+    dockerfilePath: ./shop/Dockerfile
+    healthCheckPath: /health.php
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: RULELOCK_URL                # https://rulelock.onrender.com (the real URL of the rulelock service)
+        sync: false
+      - key: RULELOCK_API_TOKEN          # the same value as in rulelock
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: RULELOCK_MOCK               # ignored in production; kept at 0 on purpose
+        value: "0"

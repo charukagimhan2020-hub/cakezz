@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+Dockerfile
+TESTING.md
+README.md

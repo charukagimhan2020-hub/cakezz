@@ -1,0 +1,36 @@
+{
+  "allowed_top_level": ["shop","rulelock","supabase","scripts","docs","state",
+    "README.md","STATE.md","CONTRACT.md","docker-compose.yml","render.yaml",".gitignore",".dockerignore",".env",".env.example"],
+  "names": {
+    "0": "Foundation (schema, env, compose, setup guide)",
+    "1": "Cakezz shop (PHP, light)",
+    "2": "c2 rule engine",
+    "3": "c3 anomaly detection",
+    "4": "c4 enforcement engine",
+    "5": "c1 data collection + orchestrator",
+    "6": "Monitor tab (dark)",
+    "7": "Integration, deploy, demo"
+  },
+  "needs": {"0": [], "1": [0], "2": [0], "3": [0], "4": [0], "5": [0,2,3,4], "6": [1], "7": [0,1,2,3,4,5,6]},
+  "owns": {
+    "0": ["supabase/", "docker-compose.yml", "docs/SETUP.md"],
+    "1": ["shop/"],
+    "2": ["rulelock/c2-rule-engine/"],
+    "3": ["rulelock/c3-anomaly-detection/"],
+    "4": ["rulelock/c4-enforcement-engine/"],
+    "5": ["rulelock/c1-data-collection/", "rulelock/Dockerfile", "rulelock/.env.example", "rulelock/pyproject.toml", "scripts/smoke_test.sh"],
+    "6": ["shop/monitor/"],
+    "7": [""]
+  },
+  "owns_exclude": {"1": ["shop/monitor/"]},
+  "expects": {
+    "0": ["supabase/schema.sql", "docker-compose.yml", "docs/SETUP.md", "shop/.env.example", "rulelock/.env.example"],
+    "1": ["shop/Dockerfile", "shop/index.php"],
+    "2": ["rulelock/c2-rule-engine/rules.py", "rulelock/c2-rule-engine/__init__.py"],
+    "3": ["rulelock/c3-anomaly-detection/scoring.py", "rulelock/c3-anomaly-detection/train_model.py", "rulelock/c3-anomaly-detection/__init__.py"],
+    "4": ["rulelock/c4-enforcement-engine/decision.py", "rulelock/c4-enforcement-engine/actions.py", "rulelock/c4-enforcement-engine/audit.py", "rulelock/c4-enforcement-engine/__init__.py"],
+    "5": ["rulelock/c1-data-collection/app.py", "rulelock/c1-data-collection/pipeline.py", "rulelock/Dockerfile", "scripts/smoke_test.sh"],
+    "6": ["shop/monitor/index.php", "shop/monitor/api.php"],
+    "7": ["README.md", "render.yaml", "docs/DEMO.md"]
+  }
+}

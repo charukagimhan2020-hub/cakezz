@@ -1,0 +1,30 @@
+# Shared project file for the four RuleLock folders (their names have a hyphen, so they are put on the
+# import path by c1-data-collection/paths.py and by the pytest setting below).
+[project]
+name = "rulelock"
+version = "0.1.0"
+description = "RuleLock AI backend: c1 data collection, c2 rule engine, c3 anomaly detection, c4 enforcement"
+requires-python = ">=3.11"
+dependencies = [
+    "Flask==3.0.3",
+    "requests==2.32.3",
+    "python-dotenv==1.0.1",
+    "scikit-learn==1.5.1",
+    "numpy==1.26.4",
+    "joblib==1.4.2",
+    "gunicorn==23.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.2.2", "Flask-Cors==4.0.1"]
+
+# `pytest` run from rulelock/ runs the c1 tests (which use the real c2, c3, c4).
+# Run c2, c3 and c4 tests from inside their own folders: each one has its own app.py wrapper and tests.
+[tool.pytest.ini_options]
+testpaths = ["c1-data-collection/tests"]
+pythonpath = [
+    "c1-data-collection",
+    "c2-rule-engine",
+    "c3-anomaly-detection",
+    "c4-enforcement-engine",
+]
