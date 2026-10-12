@@ -259,10 +259,10 @@ on conflict (id) do nothing;
 -- Then replace the text PASTE_PHP_HASH_HERE below (keep the single quotes) and run the file again.
 -- While the placeholder is still there, the admin row is NOT changed.
 insert into users (username, password_hash, role, phone)
-values ('admin', 'PASTE_PHP_HASH_HERE', 'admin', null)
+values ('admin', '$2y$10$klsvT3MocTm2Q/qTBh0IEunGSWRfxXlodA2QjaQsj2Zb0kulY.M/2', 'admin', null)
 on conflict (username) do update
   set password_hash = excluded.password_hash, role = 'admin'
-  where excluded.password_hash <> 'PASTE_PHP_HASH_HERE';
+  where excluded.password_hash <> '$2y$10$klsvT3MocTm2Q/qTBh0IEunGSWRfxXlodA2QjaQsj2Zb0kulY.M/2';
 -- NOTE: on a brand-new database the first run inserts the admin row with the
 -- placeholder (admin cannot log in yet). Paste the hash and re-run: it is then fixed.
 
