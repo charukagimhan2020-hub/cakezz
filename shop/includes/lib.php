@@ -70,6 +70,28 @@ function order_load(int $id): ?array {
     return $rows[0] ?? null;
 }
 
+// Ids from the browser that really are products (at most 200 are looked up). Others are stored as NULL.
+function known_product_ids(array $ids): array {
+    $ids = array_slice(array_values(array_unique(array_filter(array_map('intval', $ids), fn($i) => $i > 0))), 0, 200);
+    if (!$ids) return [];
+    $rows = sb_select('products', ['select' => 'id', 'id' => 'in.(' . implode(',', $ids) . ')']);
+    return array_map('intval', array_column($rows, 'id'));
+}
+
+// Coupon codes this account has already used. FRONT-END lock only (the server never refuses a coupon):
+// recorded uses (coupons_used) plus the coupons of this account's orders that went through, are waiting or are on hold.
+function used_coupon_codes(int $uid): array {
+    $codes = array_column(sb_select('coupons_used', ['select' => 'code', 'user_id' => 'eq.' . $uid]), 'code');
+    $orders = sb_select('orders', ['select' => 'coupons_applied', 'user_id' => 'eq.' . $uid,
+                                   'status' => 'in.(PENDING,PLACED,COMPLETED,HELD,CANCELLED)', 'limit' => 1000]);
+    foreach ($orders as $o) {
+        foreach ((array)($o['coupons_applied'] ?? []) as $c) {
+            if (is_string($c) && $c !== '') $codes[] = strtoupper($c);
+        }
+    }
+    return array_values(array_unique(array_map('strtoupper', $codes)));
+}
+
 function record_coupons_used(int $uid, int $oid, array $codes): void {
     if (!$codes) return;
     $valid = array_column(sb_select('coupons', ['select' => 'code']), 'code');

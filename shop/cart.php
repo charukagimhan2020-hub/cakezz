@@ -41,8 +41,7 @@ if (is_post()) {
 
 $lines = cart_lines();
 $coupons = sb_select('coupons', ['select' => 'code,percent', 'order' => 'percent.desc']);
-$usedRows = sb_select('coupons_used', ['select' => 'code', 'user_id' => 'eq.' . (int)$user['id']]);
-$used = array_column($usedRows, 'code');
+$used = used_coupon_codes((int)$user['id']);          // each coupon (50%, 20%, 10%) can be used once per account
 $subtotal = 0.0;
 foreach ($lines as $l) $subtotal += (float)$l['product']['base_price'] * $l['quantity'];
 
@@ -64,7 +63,7 @@ page_header('Your cart');
         <input type="hidden" name="items[<?= $i ?>][unit_price]" value="<?= h($p['base_price']) ?>">
       </td>
       <td><?= h(money($p['base_price'])) ?></td>
-      <td><input class="qty" type="number" min="1" name="items[<?= $i ?>][quantity]" value="<?= (int)$l['quantity'] ?>"></td>
+      <td><input class="qty" type="number" name="items[<?= $i ?>][quantity]" value="<?= (int)$l['quantity'] ?>"></td>
       <td class="line-total"><?= h(money((float)$p['base_price'] * $l['quantity'])) ?></td>
       <td><button class="linkbtn" name="action" value="remove" onclick="document.getElementById('rid').value=<?= (int)$p['id'] ?>">Remove</button></td>
     </tr>
@@ -75,7 +74,7 @@ page_header('Your cart');
 
   <h3>Coupon</h3>
   <div class="coupons">
-<?php foreach ($coupons as $c): $isUsed = in_array($c['code'], $used, true); ?>
+<?php foreach ($coupons as $c): $isUsed = in_array(strtoupper($c['code']), $used, true); ?>
     <label class="coupon<?= $isUsed ? ' grey' : '' ?>">
       <input type="checkbox" class="coupon-box" name="coupons[]" value="<?= h($c['code']) ?>"
              data-percent="<?= (int)$c['percent'] ?>" data-used="<?= $isUsed ? 1 : 0 ?>" <?= $isUsed ? 'disabled' : '' ?>>
@@ -95,7 +94,7 @@ page_header('Your cart');
   <input type="hidden" name="total" id="f_total" value="<?= h(number_format($subtotal, 2, '.', '')) ?>">
 
   <h3>Checkout</h3>
-  <label for="addr">Delivery address</label>
+  <label for="addr">Delivery address (optional)</label>
   <input type="text" id="addr" name="address" maxlength="200" placeholder="Made-up address">
   <label>Payment</label>
   <label style="font-weight:400"><input type="radio" name="payment_method" value="CARD" checked> Card</label>

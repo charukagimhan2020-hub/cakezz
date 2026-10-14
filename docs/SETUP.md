@@ -21,6 +21,7 @@ Open `supabase/schema.sql`, find `PASTE_PHP_HASH_HERE` (near the end) and replac
 4. Section 3 of the file is the team's own audit-log migration (insert-only audit table and the `record_rulelock_review` function). Do not edit it.
 
 ## 4. Find the URL and the secret key
+**Never type the secret key into a code file** (not as a default in `config.py`, not in `render.yaml`): it ends up in git. Put it only in the Render dashboard (Environment) or in your local `.env`. If a key was ever committed or shared, create a new one in Supabase (Project Settings > API) and replace it everywhere. `scripts/check_integration.py` fails when it finds a key in the repo files.
 Supabase **Project Settings > API**: Project URL = `SUPABASE_URL`. The **secret** (service_role) key = `SUPABASE_SECRET_KEY`. Never use the anon / publishable key. Never put the secret key in the repo or in the browser.
 Make one long random string for `RULELOCK_API_TOKEN` (shop and RuleLock must have the SAME value):
 ```

@@ -7,8 +7,9 @@ Run these on the deployed Render shop (or on http://localhost:8080 with `docker 
 2. Use **one browser window for the admin** (toggle + monitor + Admin > Orders) and **a separate Incognito/private window for each customer**. Why: RuleLock counts how many different accounts log in from one browser (the `device_id` cookie) in 24 hours. Two customers in the same browser look like account farming, and the second one gets blocked. A new Incognito window = a new device.
 3. Where to look: **Admin > Orders** shows status, discount, total, coupons and the RuleLock decision and reason for every order. With RuleLock ON the dark **monitor tab** (`/monitor/`) shows the four steps.
 4. Each account can use each coupon once (a used coupon is greyed out "already used"). Use a fresh account per case, or a different coupon.
-5. Console tips: open dev tools (F12), tab **Console**, click the cart page first, paste the snippet, press Enter, then click **Place order**. If Chrome asks, type `allow pasting`. Always paste the snippet LAST (changing the quantity or a coupon afterwards recalculates the hidden fields).
-6. Reset between rounds (Supabase SQL Editor; the audit log is insert-only and stays):
+5. **Two rules of the shop to keep in mind.** (a) With RuleLock **OFF** the shop refuses nothing at checkout: a blank address, quantity 0, -1 or 9999, a made-up price, total or product id, any coupon: the order is stored exactly as sent. All checks (prices, totals, quantity, coupons, COD history, anomaly score) happen only with RuleLock **ON**. (b) Coupon lock, front end only: each account can use each coupon (50%, 20%, 10%) once. After an order with CAKE50 is placed, completed, waiting for payment or on hold, CAKE50 is greyed out "already used" in that account's cart for good; and a cart takes one coupon at a time (ticking one greys the other two). The server does not enforce this when OFF; that is what attacks c and d use.
+6. Console tips: open dev tools (F12), tab **Console**, click the cart page first, paste the snippet, press Enter, then click **Place order**. If Chrome asks, type `allow pasting`. Always paste the snippet LAST (changing the quantity or a coupon afterwards recalculates the hidden fields).
+7. Reset between rounds (Supabase SQL Editor; the audit log is insert-only and stays):
 ```sql
 delete from account_restrictions;
 delete from coupons_used;

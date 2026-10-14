@@ -124,6 +124,7 @@ CREATE INDEX IF NOT EXISTS rulelock_audit_log_live_decision_idx
 CREATE UNIQUE INDEX IF NOT EXISTS rulelock_audit_log_one_row_per_review
     ON public.rulelock_audit_log (event_type, order_id);
 
+-- (The ::text casts below let this run even when an older project has transaction_events.event_id as text.)
 -- Backfill existing RuleLock events so the dashboard has a complete audit
 -- history from the point this migration is applied. Keep only minimal fields.
 INSERT INTO public.rulelock_audit_log (
@@ -131,7 +132,7 @@ INSERT INTO public.rulelock_audit_log (
     order_reference, account_id, payment_method, total, rule_code, anomaly_score
 )
 SELECT
-    e.event_id,
+    e.event_id::text::uuid,
     e.event_type,
     e.order_id,
     e.created_at,
@@ -155,6 +156,7 @@ SELECT
 FROM public.transaction_events AS e
 WHERE e.event_type IN ('RULELOCK_REVIEW', 'RULELOCK_SIMULATION')
   AND e.event_id IS NOT NULL
+  AND e.event_id::text ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
   AND e.order_id IS NOT NULL
 ON CONFLICT (event_id) DO NOTHING;
 

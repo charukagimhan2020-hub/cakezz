@@ -210,6 +210,55 @@ try:
 except ImportError:
     check("render.yaml / docker-compose parse (needs PyYAML)", True, "skipped: PyYAML not installed")
 
+# ---------- secrets and the validation-free OFF path ----------
+secret_hits = []
+for p in ROOT.rglob("*"):
+    if not p.is_file() or ".git" in p.parts or p.suffix in {".joblib", ".zip", ".pyc", ".png", ".jpg", ".svg"} or "node_modules" in p.parts:
+        continue
+    try:
+        text = p.read_text(encoding="utf-8")
+    except (UnicodeDecodeError, OSError):
+        continue
+    if re.search(r"sb_secret_[A-Za-z0-9_-]{12,}|eyJ[A-Za-z0-9_-]{30,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}", text):
+        secret_hits.append(str(p.relative_to(ROOT)))
+check("no Supabase secret key (sb_secret_... or a JWT) anywhere in the repo files", not secret_hits, "FOUND in: " + ", ".join(secret_hits))
+cfg = read("rulelock/c1-data-collection/config.py")
+check("config.py has no default Supabase URL or key", 'os.environ.get("SUPABASE_URL", "")' in cfg and 'os.environ.get("SUPABASE_SECRET_KEY", "")' in cfg)
+pre = checkout.split("$on = rulelock_enabled(true);")[1].split("// ---- toggle OFF: vulnerable path")[0]
+pre_checks = pre.split("$rows = [];")[0]                 # everything before the order is created (the DB-failure message after it is not a validation)
+
+
+def unguarded_errors(code):
+    """flash('error') calls that are NOT inside a block whose header mentions $on (brace-depth walk)."""
+    stack, head, bad, i = [], "", 0, 0
+    while i < len(code):
+        ch = code[i]
+        if ch == "{":
+            stack.append(head)
+            head = ""
+        elif ch == "}":
+            stack.pop() if stack else None
+            head = ""
+        elif ch == ";":
+            head = ""
+        else:
+            head += ch
+        if code.startswith("flash('error'", i) and not any("$on" in h for h in stack):
+            bad += 1
+        i += 1
+    return bad
+
+
+errors = re.findall(r"flash\('error'", pre_checks)
+guarded = [None] * (len(errors) - unguarded_errors(pre_checks))
+rl_use = re.findall(r"rl_review|rl_http|rl_event", pre.split("if ($on) {")[0])
+check("checkout: with RuleLock OFF no order is refused (every error is inside an `if ($on ...)` block, no RuleLock call before it)",
+      len(errors) == len(guarded) and not rl_use and "Your cart is empty" not in checkout and "delivery address" not in checkout.lower().replace("optional", ""),
+      f"errors {len(errors)}, guarded {len(guarded)}, early RuleLock calls {rl_use}")
+check("cart quantity box has no browser min/max (OFF accepts 0, -1, 9999)", 'class="qty" type="number" name="items[' in read("shop/cart.php") and "min=" not in re.search(r'<input class="qty"[^>]*>', read("shop/cart.php")).group(0))
+check("coupon lock per account is front-end only and uses recorded uses and the account's orders",
+      "used_coupon_codes" in read("shop/cart.php") and "function used_coupon_codes" in read("shop/includes/lib.php") and "coupons_used" in read("shop/includes/lib.php"))
+
 # ---------- docs exist ----------
 for doc in ("README.md", "docs/SETUP.md", "docs/DEMO.md", "docs/VIVA.md", "docs/RISKS.md", "docs/E2E_TESTS.md"):
     check(f"{doc} exists", (ROOT / doc).exists())

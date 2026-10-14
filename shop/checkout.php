@@ -10,11 +10,17 @@ $back = '/cart.php' . mock_qs();
 // The toggle is read from the database on EVERY checkout (never cached).
 $on = rulelock_enabled(true);
 
-$pm = $_POST['payment_method'] ?? '';
-if (!in_array($pm, ['CARD', 'COD'], true)) { flash('error', 'Please choose Card or Cash on Delivery.'); redirect($back); }
-$address = trim((string)($_POST['address'] ?? ''));
-if ($address === '') { flash('error', 'Please enter a delivery address.'); redirect($back); }
-$address = substr($address, 0, 200);
+// ---- NO validation of the order here ----
+// Toggle OFF: every order goes through exactly as submitted (VULNERABLE BY DESIGN). Missing address, an empty cart,
+// strange payment values, unknown product ids: nothing is refused.
+// Toggle ON: all business checks (prices, totals, quantity, coupons, COD history, anomaly score) are RuleLock's job.
+$pmRaw = (string)($_POST['payment_method'] ?? '');
+if ($on && !in_array($pmRaw, ['CARD', 'COD'], true)) {      // ON only: a form without a payment choice cannot be reviewed
+    flash('error', 'Please choose Card or Cash on Delivery.');
+    redirect($back);
+}
+$pm = ($pmRaw === 'CARD') ? 'CARD' : 'COD';                // OFF: anything that is not CARD is taken as COD
+$address = substr(trim((string)($_POST['address'] ?? '')), 0, 200);   // optional
 
 // ---- read what the browser sent ----
 // VULNERABLE BY DESIGN: unit price, quantity, discount and total are taken from the browser as they are.
@@ -27,7 +33,6 @@ foreach ((array)($_POST['items'] ?? []) as $it) {
         'unit_price' => num($it['unit_price'] ?? 0),        // VULNERABLE BY DESIGN: trusts the unit price
     ];
 }
-if (!$items) { flash('error', 'Your cart is empty.'); redirect($back); }
 
 $subtotal = num($_POST['subtotal'] ?? 0);                   // VULNERABLE BY DESIGN: trusts the subtotal
 $discount = num($_POST['discount_value'] ?? 0);             // VULNERABLE BY DESIGN: trusts the discount
@@ -38,7 +43,7 @@ foreach ((array)($_POST['coupons'] ?? []) as $c) {
     if (is_string($c) && $c !== '') $coupons[] = strtoupper(substr(trim($c), 0, 20));
 }
 
-$_SESSION['address_hash'] = sha(strtolower($address));
+if ($address !== '') $_SESSION['address_hash'] = sha(strtolower($address));
 
 // ---- toggle ON: rate-limit check and events ----
 if ($on) {
@@ -60,14 +65,16 @@ $order = create_order($user, $status, $pm, $subtotal, $discount, $total, $coupon
 $oid = (int)$order['id'];
 
 $rows = [];
+$known = known_product_ids(array_column($items, 'product_id'));     // an unknown product id is stored as NULL, not refused
 foreach ($items as $it) {
-    $rows[] = ['order_id' => $oid, 'product_id' => $it['product_id'], 'quantity' => $it['quantity'], 'unit_price' => $it['unit_price']];
+    $rows[] = ['order_id' => $oid, 'product_id' => in_array($it['product_id'], $known, true) ? $it['product_id'] : null,
+               'quantity' => $it['quantity'], 'unit_price' => $it['unit_price']];
 }
 try {
-    sb_insert('order_items', $rows);
+    if ($rows) sb_insert('order_items', $rows);
 } catch (SbError $e) {
     sb_delete('orders', ['id' => 'eq.' . $oid]);
-    flash('error', 'Could not create the order. Please check the cart and try again.');
+    flash('error', 'Could not create the order. Please try again.');
     redirect($back);
 }
 

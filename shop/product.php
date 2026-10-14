@@ -25,7 +25,7 @@ page_header($p['name']);
       <?= csrf_field() ?>
       <input type="hidden" name="product_id" value="<?= (int)$p['id'] ?>">
       <label for="q">Quantity</label>
-      <input class="qty" id="q" type="number" name="quantity" value="1" min="1" <?= $stock > 0 ? 'max="' . $stock . '"' : '' ?>>
+      <input class="qty" id="q" type="number" name="quantity" value="1" min="1">
       <p class="actions">
         <button class="btn" name="action" value="add" <?= $stock < 1 ? 'disabled' : '' ?>>Add to cart</button>
         <button class="btn alt" name="action" value="buy" <?= $stock < 1 ? 'disabled' : '' ?>>Buy now</button>

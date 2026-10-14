@@ -13,8 +13,10 @@ Mock mode: add `?mock=accept|void_discount|hold|reject` to the cart URL, e.g. `/
 7. Card order: address "any", Card, **Place order**. Fake payment page opens. Type anything (or nothing), **Pay**. Order shows COMPLETED. Cart is empty.
 8. COD order: choose COD, **Place order**. Order PLACED. My orders > **Cancel** it: status CANCELLED. (Supabase: `cancelled_by = CUSTOMER`.)
 9. Coupon used in step 7 is now greyed out "(already used)" in the cart.
-10. Vulnerabilities (dev tools, Elements): edit the hidden `unit_price`, `subtotal`, `discount_value`, `total`, set quantity to 0, -3 or 99999, tick two coupons by removing `disabled`, reuse a used coupon, place many COD orders. All of them must go through with the toggle OFF.
-11. Admin > Orders lists the orders (with the tampered values) and **Remove** deletes one. No approve/review buttons.
+10. Coupon lock (front end only): as `kamal`, buy once with CAKE20 (Card or COD). In every later cart CAKE20 is greyed "already used"; CAKE50 and CAKE10 are still free until used; ticking one of them greys out the other two. Log in as another account: all three are free again.
+11. OFF refuses nothing: leave the address empty and Place order: it goes through. In the Console set a quantity box to -1 (no browser minimum any more) or paste a product id that does not exist (`document.querySelector('input[name$="[product_id]"]').value = 99999`): the order is still created (an unknown product is stored as empty).
+12. Vulnerabilities (dev tools, Elements): edit the hidden `unit_price`, `subtotal`, `discount_value`, `total`, set quantity to 0, -3 or 99999, tick two coupons by removing `disabled`, reuse a used coupon, place many COD orders. All of them must go through with the toggle OFF.
+13. Admin > Orders lists the orders (with the tampered values) and **Remove** deletes one. No approve/review buttons.
 
 ## B. Toggle ON (with the mock)
 1. Admin > **Turn RuleLock AI ON**. A new tab opens the dark RuleLock monitor at `/monitor/`. The admin page says ON.
